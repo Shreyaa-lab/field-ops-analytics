@@ -234,3 +234,33 @@ SELECT rejection_reason,
        COUNT(*) FILTER (WHERE reprocessed_at IS NOT NULL) AS rows_reprocessed
 FROM core.rejected_submissions
 GROUP BY rejection_reason;
+
+-- ---------------------------------------------------------------------
+-- 9. Weekly compliance by region, ranked within each tenant
+--    (my addition: helps regional managers compare areas week by week)
+-- ---------------------------------------------------------------------
+CREATE VIEW analytics.region_weekly_compliance AS
+WITH weekly AS (
+    SELECT
+        f.tenant_id,
+        s.region,
+        date_trunc('week', f.local_date)::date        AS week_start,
+        COUNT(*)                                      AS expected,
+        ROUND(100.0 * AVG(f.is_submitted::int), 1)    AS compliance_pct,
+        ROUND(100.0 * AVG(f.is_on_time::int), 1)      AS on_time_pct
+    FROM analytics.fact_expected_vs_actual f
+    JOIN core.stores s ON s.store_id = f.store_id
+    GROUP BY f.tenant_id, s.region, date_trunc('week', f.local_date)::date
+)
+SELECT
+    t.tenant_name,
+    w.region,
+    w.week_start,
+    w.expected,
+    w.compliance_pct,
+    w.on_time_pct,
+    RANK() OVER (PARTITION BY w.tenant_id, w.week_start ORDER BY w.compliance_pct DESC) AS rank_in_tenant,
+    w.compliance_pct - LAG(w.compliance_pct) OVER (PARTITION BY w.tenant_id, w.region ORDER BY w.week_start)
+        AS change_vs_last_week
+FROM weekly w
+JOIN core.tenants t ON t.tenant_id = w.tenant_id;
