@@ -1,0 +1,9 @@
+tenant_id,tenant_name,industry,timezone,onboarded_on
+1,Spice Route Kitchens,Quick Service Restaurant,Asia/Kolkata,2024-01-15
+2,UrbanMart Retail,Retail,Asia/Kolkata,2024-01-15
+3,Desert Bloom Cafes,Cafe,Asia/Dubai,2024-01-15
+4,Lion City Pharmacy,Pharmacy,Asia/Singapore,2024-01-15
+5,Thames Fresh Grocers,Grocery,Europe/London,2024-01-15
+6,Liberty Burger Co,Quick Service Restaurant,America/New_York,2024-01-15
+7,Prairie Home Stores,Retail,America/Chicago,2024-01-15
+8,Harbour Stay Hotels,Hospitality,Australia/Sydney,2024-01-15

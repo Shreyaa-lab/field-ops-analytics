@@ -1,0 +1,21 @@
+reminder_id,tenant_id,form_id,employee_id,store_id,sent_at,reminder_type,delivered
+1,1,3,3,1,2026-08-20 05:30:00+00,reminder,True
+2,1,3,4,1,2026-08-20 05:30:00+00,reminder,True
+3,1,3,3,1,2026-08-21 05:30:00+00,reminder,False
+4,1,3,4,1,2026-08-21 05:30:00+00,reminder,True
+5,1,3,1,1,2026-08-22 08:30:00+00,escalation,True
+6,1,1,2,1,2026-08-23 03:30:00+00,reminder,True
+7,1,2,1,1,2026-08-23 16:30:00+00,reminder,True
+8,1,3,1,1,2026-08-23 08:30:00+00,escalation,True
+9,1,3,4,1,2026-08-23 05:30:00+00,reminder,True
+10,1,1,1,1,2026-08-24 03:30:00+00,reminder,True
+11,1,2,2,1,2026-08-24 16:30:00+00,reminder,True
+12,1,3,1,1,2026-08-24 05:30:00+00,reminder,True
+13,1,3,4,1,2026-08-24 05:30:00+00,reminder,True
+14,1,3,4,1,2026-08-25 05:30:00+00,reminder,True
+15,1,3,4,1,2026-08-25 08:30:00+00,escalation,True
+16,1,2,2,1,2026-08-26 16:30:00+00,reminder,True
+17,1,3,3,1,2026-08-26 05:30:00+00,reminder,True
+18,1,3,4,1,2026-08-26 05:30:00+00,reminder,True
+19,1,1,4,1,2026-08-27 06:30:00+00,escalation,True
+20,1,3,3,1,2026-08-27 08:30:00+00,escalation,True
