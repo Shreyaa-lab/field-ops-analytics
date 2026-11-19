@@ -1,0 +1,16 @@
+# generated data (anyone can recreate it with src/generate_data.py)
+data/raw/*.csv
+data/late_arriving/*.csv
+!data/sample/*.csv
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+.env

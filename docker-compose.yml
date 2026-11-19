@@ -1,0 +1,37 @@
+# PostgreSQL (the warehouse) + Metabase (the dashboards)
+# Start:  docker compose up -d
+# Stop:   docker compose down        (add -v to also delete the data)
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: fieldops-postgres
+    environment:
+      POSTGRES_DB: fieldops
+      POSTGRES_USER: analyst
+      POSTGRES_PASSWORD: analyst
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analyst -d fieldops"]
+      interval: 5s
+      retries: 10
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: fieldops-metabase
+    ports:
+      - "3000:3000"
+    volumes:
+      - metabase-data:/metabase-data
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  metabase-data:
