@@ -58,7 +58,7 @@ erDiagram
     COURSES ||--o{ COURSE_PROGRESS : tracks
 ```
 
-**Data size (default settings):** 8 tenants, 284 stores, 1,989 employees, 90 days of history. 184,270 raw submissions, 91,569 reminders and 8,133 training records, and 219,468 expected submissions in the analytics fact. Use `--scale` and `--days` to generate more.
+**Data size (default settings):** 8 tenants, 284 stores, 1,989 employees, 90 days of history. 183,850 raw submissions, 91,569 reminders and 8,133 training records, and 219,468 expected submissions in the analytics fact. Use `--scale` and `--days` to generate more.
 
 ## What the pipeline does
 
@@ -73,7 +73,7 @@ Rules are applied in order, and every rejected row is kept with its reason:
 | `unknown_employee`: employee not in HR data (orphan) | 201 |
 | `future_timestamp`: device clock ahead of real time | 184 |
 
-Status text is standardised (`" Completed "`, `"COMPLETE"` → `completed`). 180,623 clean submissions reach `core`.
+Status text is standardised (`" Completed "`, `"COMPLETE"` → `completed`). 180,234 clean submissions reach `core`.
 
 ### 2. Data quality gate
 
@@ -81,7 +81,7 @@ Status text is standardised (`" Completed "`, `"COMPLETE"` → `completed`). 180
 
 ### 3. Reprocessing late-arriving data
 
-Some new joiners submit forms before HR adds them. Once their records arrive (`data/late_arriving/late_employees.csv`), `python src/run_pipeline.py --reprocess` re-validates the quarantined rows against **every** rule and moves the valid ones into core, **without rerunning the full pipeline**. In the default dataset, 94 of 239 orphan rows were recovered. The script is idempotent: running it again changes nothing.
+Some new joiners submit forms before HR adds them. Once their records arrive (`data/late_arriving/late_employees.csv`), `python src/run_pipeline.py --reprocess` re-validates the quarantined rows against **every** rule and moves the valid ones into core, **without rerunning the full pipeline**. In the default dataset, 117 of 241 orphan rows were recovered. The script is idempotent: running it again changes nothing.
 
 ### 4. Timezone-correct reporting
 
@@ -102,18 +102,18 @@ A missed checklist leaves no row behind, so compliance can't be calculated from 
 | `data_quality_summary` | How much bad data arrived, and how much was recovered? | |
 | `region_weekly_compliance` | Which regions are best and worst each week, and are they improving? | `RANK`, `LAG`, join to store attributes |
 
-**Headline numbers:** overall compliance is 82.3%, and only 67.0% of expected forms arrive on time.
+**Headline numbers:** overall compliance is 82.1%, and only 66.8% of expected forms arrive on time.
 
 ### 6. Query performance
 
 Indexes in `sql/06_indexes.sql` were chosen from the real query patterns (equality column first, then the date range). `src/benchmark.py` measures each query with `EXPLAIN ANALYZE` (median of 15 runs) before and after:
 
-| Query | Before (ms) | After (ms) | Improvement | Plan change |
-|---|---:|---:|---:|---|
-| Store manager view: one store, last 14 days | 11.93 | 0.06 | 209x | Seq Scan → Index Scan |
-| Support troubleshooting: one employee's latest submissions | 6.66 | 0.01 | 606x | Seq Scan → Index Scan |
-| Tenant dashboard: daily volume, last 7 days | 11.97 | 0.45 | 27x | Seq Scan → Index Scan |
-| Reminder follow-up: one tenant, one week | 40.84 | 5.66 | 7x | Seq Scan → Bitmap Index Scan |
+| Query | Before (ms) | After (ms) | Improvement | Scan before | Scan after |
+|---|---:|---:|---:|---|---|
+| Store manager view - one store, last 14 days | 3.94 | 0.03 | 141x (99.3% less time) | Seq Scan | Index Scan |
+| Support troubleshooting - one employee's latest submissions | 3.61 | 0.01 | 516x (99.8% less time) | Seq Scan | Index Scan |
+| Tenant dashboard - daily volume for the last 7 days | 3.61 | 0.25 | 14x (93.0% less time) | Seq Scan | Index Scan |
+| Reminder follow-up - one tenant, one week | 25.51 | 2.63 | 10x (89.7% less time) | Seq Scan | Bitmap Heap Scan, Bitmap Index Scan |
 
 Full results: [`docs/benchmark_results.md`](docs/benchmark_results.md). Times are from a laptop and will vary.
 
